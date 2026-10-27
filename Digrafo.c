@@ -799,6 +799,7 @@ utiliza para la reflexion Pila de matrices  en donde tenemos glPushMatrix y glPo
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // limpiar pantalla
+	glEnable(GL_DEPTH_TEST);
 	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -808,18 +809,27 @@ void display(void)
 	glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
 
+  glShadeModel(GL_SMOOTH);
 
-  GLfloat luz_ambiente[] = { 0.7f, 0.7f, 0.7f, 1.0f }; 
-  GLfloat luz_difusa[]   = { 1.0f, 1.0f, 1.0f, 1.0f }; 
-  GLfloat posicion_luz[] = { 0.0f, 0.0f, 10.0f, 1.0f }; // Luz frente al rostro
+
+  GLfloat luz_ambiente[] = { 0.45f, 0.45f, 0.45f, 1.0f }; 
+  GLfloat luz_difusa[]   = { 0.9f,  0.85f, 0.8f,  1.0f };
+  GLfloat posicion_luz[] = { 0.0f, 0.0f, 10.0f, 0.0f };
+
+  // brillo para hacer la linea del tabique
+  GLfloat luz_especular[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+  GLfloat brillo_material[] = { 25.0f };
 
   glLightfv(GL_LIGHT0, GL_AMBIENT, luz_ambiente);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, luz_difusa);
   glLightfv(GL_LIGHT0, GL_POSITION, posicion_luz);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, luz_especular);
 
    
   glEnable(GL_COLOR_MATERIAL);
-  glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+  glMaterialfv(GL_FRONT, GL_SPECULAR, luz_especular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, brillo_material);
 
 	glTranslatef(0.0f, -0.4f, -5.0f);
 	glScalef(4.8f, 4.8f, 1.0f);
@@ -847,7 +857,7 @@ void display(void)
 	 tx y ty manda a llamar traslacion para que se mueva
 	*/
 	glBegin(GL_TRIANGLES);
-	glNormal3f(0.0f, 0.0f, 1.0f);
+	//glNormal3f(0.0f, 0.0f, 1.0f);
 
 	for(int i = 0; i < totalConexiones; i++)
 	{
@@ -859,6 +869,31 @@ void display(void)
 		obtenerTraslacion(id1, &tx1, &ty1, &tz1);
 		obtenerTraslacion(id2, &tx2, &ty2, &tz2);
 		obtenerTraslacion(id3, &tx3, &ty3, &tz3);
+
+		float v1x = mallaFacial[id1].coordenada.x + tx1;
+		float v1y = mallaFacial[id1].coordenada.y + ty1;
+		float v1z = mallaFacial[id1].coordenada.z + tz1;
+
+		float v2x = mallaFacial[id2].coordenada.x + tx2;
+		float v2y = mallaFacial[id2].coordenada.y + ty2;
+		float v2z = mallaFacial[id2].coordenada.z + tz2;
+
+		float v3x = mallaFacial[id3].coordenada.x + tx3;
+		float v3y = mallaFacial[id3].coordenada.y + ty3;
+		float v3z = mallaFacial[id3].coordenada.z + tz3;
+
+		float nx = ((v2y - v1y) * (v3z - v1z)) - ((v2z - v1z) * (v3y - v1y));
+		float ny = ((v2z - v1z) * (v3x - v1x)) - ((v2x - v1x) * (v3z - v1z));
+		float nz = ((v2x - v1x) * (v3y - v1y)) - ((v2y - v1y) * (v3x - v1x));
+
+		if (nz < 0.0f) 
+		{
+			nx = -nx;
+			ny = -ny;
+			nz = -nz;
+		}
+
+		glNormal3f(nx, ny, nz);
 
 		float u1, v1, u2, v2, u3, v3;
 
@@ -887,12 +922,12 @@ void display(void)
 			v3 = 0.5f; 
 		}
 
-		glTexCoord2f(u1, v1);
-		glVertex3f(mallaFacial[id1].coordenada.x + tx1, mallaFacial[id1].coordenada.y + ty1, mallaFacial[id1].coordenada.z + tz1);
-		glTexCoord2f(u2, v2);
-		glVertex3f(mallaFacial[id2].coordenada.x + tx2, mallaFacial[id2].coordenada.y + ty2, mallaFacial[id2].coordenada.z + tz2);
-		glTexCoord2f(u3, v3);
-		glVertex3f(mallaFacial[id3].coordenada.x + tx3, mallaFacial[id3].coordenada.y + ty3, mallaFacial[id3].coordenada.z + tz3);
+		glTexCoord2f(u1, v1); 
+		glVertex3f(v1x, v1y, v1z);
+		glTexCoord2f(u2, v2); 
+		glVertex3f(v2x, v2y, v2z);
+		glTexCoord2f(u3, v3); 
+		glVertex3f(v3x, v3y, v3z);
 	}
 	glEnd();
 
@@ -900,7 +935,7 @@ void display(void)
 	glScalef(-1.0f, 1.0f, 1.0f); 
 
 	glBegin(GL_TRIANGLES);
-	glNormal3f(0.0f, 0.0f, 1.0f);
+	//glNormal3f(0.0f, 0.0f, 1.0f);
 	for(int i = 0; i < totalConexiones; i++)
 	{
 		int id1 = conexiones[i][0];
@@ -911,6 +946,31 @@ void display(void)
 		obtenerTraslacion(id1, &tx1, &ty1, &tz1);
 		obtenerTraslacion(id2, &tx2, &ty2, &tz2);
 		obtenerTraslacion(id3, &tx3, &ty3, &tz3);
+
+		float v1x = mallaFacial[id1].coordenada.x + tx1;
+		float v1y = mallaFacial[id1].coordenada.y + ty1;
+		float v1z = mallaFacial[id1].coordenada.z + tz1;
+
+		float v2x = mallaFacial[id2].coordenada.x + tx2;
+		float v2y = mallaFacial[id2].coordenada.y + ty2;
+		float v2z = mallaFacial[id2].coordenada.z + tz2;
+
+		float v3x = mallaFacial[id3].coordenada.x + tx3;
+		float v3y = mallaFacial[id3].coordenada.y + ty3;
+		float v3z = mallaFacial[id3].coordenada.z + tz3;
+
+		float nx = -(((v2y - v1y) * (v3z - v1z)) - ((v2z - v1z) * (v3y - v1y)));
+		float ny = ((v2z - v1z) * (v3x - v1x)) - ((v2x - v1x) * (v3z - v1z));
+		float nz = ((v2x - v1x) * (v3y - v1y)) - ((v2y - v1y) * (v3x - v1x));
+
+		if (nz < 0.0f) 
+		{
+			nx = -nx;
+			ny = -ny;
+			nz = -nz;
+		}
+		
+		glNormal3f(nx, ny, nz);
 
 		float u1, v1, u2, v2, u3, v3;
 
@@ -936,16 +996,17 @@ void display(void)
 			v3 = 0.5f; 
 		}
 
-		glTexCoord2f(u1, v1);
-		glVertex3f(mallaFacial[id1].coordenada.x + tx1, mallaFacial[id1].coordenada.y + ty1, mallaFacial[id1].coordenada.z + tz1);
-		glTexCoord2f(u2, v2);
-		glVertex3f(mallaFacial[id2].coordenada.x + tx2, mallaFacial[id2].coordenada.y + ty2, mallaFacial[id2].coordenada.z + tz2);
-		glTexCoord2f(u3, v3);
-		glVertex3f(mallaFacial[id3].coordenada.x + tx3, mallaFacial[id3].coordenada.y + ty3, mallaFacial[id3].coordenada.z + tz3);
+		glTexCoord2f(u1, v1); 
+		glVertex3f(v1x, v1y, v1z);
+		glTexCoord2f(u2, v2); 
+		glVertex3f(v2x, v2y, v2z);
+		glTexCoord2f(u3, v3); 
+		glVertex3f(v3x, v3y, v3z);
 	}
 	glEnd();
 	glPopMatrix(); // Restauramos el lienzo después de los triángulos
 
+	/*
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
@@ -991,12 +1052,15 @@ void display(void)
 	glEnd();
 	glPopMatrix(); // Restauramos lienzo después de las líneas
 
+	*/
+
 	glEnable(GL_POINT_SMOOTH);// es para que se vean los circulos
 	glEnable(GL_BLEND);// para los puntos
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // artefactos visuales para los puntos 
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glPointSize(8.0f);
 
+	/*
 	//dibujar la mitad original
 	glBegin(GL_POINTS);
 	for(int i = 0; i < totalNodos; i++)
@@ -1007,7 +1071,7 @@ void display(void)
 		asignarColorPunto(mallaFacial[i].key, 0);
 		glVertex3f(mallaFacial[i].coordenada.x + tx, mallaFacial[i].coordenada.y + ty, mallaFacial[i].coordenada.z + tz);
 	}
-	glEnd();
+	glEnd();*/
 
 	/*
 	// para debug de la matriz
@@ -1031,6 +1095,7 @@ void display(void)
 	glPushMatrix();
 	glScalef(-1.0f, 1.0f, 1.0f);
 
+	/*
 	glBegin(GL_POINTS);
 	for(int i = 0; i < totalNodos; i++)
 	{
@@ -1048,7 +1113,7 @@ void display(void)
 
 	glPopMatrix(); //restauramos el lienzo
 
-	
+	*/
 	glDisable(GL_TEXTURE_2D);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
