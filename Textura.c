@@ -25,7 +25,14 @@ void cargar_textura(void)
 				imagen[i][j][2] = 32;
 			}
 
-			else if (i < TEX_HEIGHT * 0.3) 
+			else if (i < TEX_HEIGHT * 0.18) 
+			{
+				imagen[i][j][0] = 245; // Rojo
+				imagen[i][j][1] = 240; // Verde
+				imagen[i][j][2] = 225; // Azul
+			}
+
+			else if (i >= TEX_HEIGHT * 0.18 && i <= TEX_HEIGHT * 0.4) 
 			{
 				imagen[i][j][0] = 25;
 				imagen[i][j][1] = 22;

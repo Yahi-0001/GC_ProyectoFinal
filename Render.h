@@ -4,8 +4,10 @@
 #include <GL/freeglut.h>
 #include "rostro.h"
 
-extern double rot_x;
-extern double rot_y;
+extern float rot_x;
+extern float rot_y;
+extern float rot_z;
+
 extern float pos_x;
 
 void asignarColorPunto(int key, int reflejo);

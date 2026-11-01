@@ -7,37 +7,109 @@ int estadoExpresion = 1; //default rostro serio
 // se pasó como una variable global devido a que la función display no puede llamarla en los parámetros
 int conexiones[][3] = {
   //oreja
-	{40, 39, 34}, {34, 41, 40}, {41, 34, 42}, {34, 42, 33},
+	{40, 39, 34},
+	{34, 41, 40},
+	{41, 34, 42},
+	{34, 42, 33},
 
 	//cejas
-	{20, 19, 22}, {19, 22, 18}, {18, 22, 17}, {22, 17, 21},
+	{20, 19, 22},
+	{19, 22, 18},
+	{18, 22, 17},
+	{22, 17, 21},
 
 	//nariz
-	{3, 23, 4}, {23, 4, 24}, {26, 6, 5},{24, 4, 25}, {25, 5, 4},
+	{3, 23, 4},
+	{23, 4, 24},
+	{26, 6, 5},
+	{24, 4, 25},
+	{25, 5, 4},
 
 	//labio superior
-	{6, 7, 26}, {7, 26, 28}, {28, 26, 27}, {27, 26, 47},
+	//{6, 7, 26}, {7, 26, 28}, {28, 26, 27}, {27, 26, 47},
+	{27, 26, 47},
+	{26, 27, 53},
+	{26, 53, 54},
+	{26, 54, 28},
+	{26, 28, 49},
+	{6, 26, 7},
+	{49, 7, 26},
 
+	
 	//labio inferior
-	{27, 30, 29}, {30, 29, 9}, {29, 8, 9},
-
+	//{27, 30, 29}, {30, 29, 9}, {29, 8, 9},
+	{30, 29, 9},
+	{27, 30, 52},
+	{30, 51, 52},
+	{30, 29, 51},
+	{29, 9, 50},
+	{9, 8, 50},
+	
 	// relleno triangulos por arriba de las cejas
-	{0, 1, 46}, {1, 2, 46}, {2, 3, 17}, {3, 17, 21}, {0, 46, 38}, 
-	{38, 46, 44}, {38, 37, 44}, {37, 36, 44}, {36, 44, 19}, {44, 19, 18},
-	{18, 44, 46}, {18, 46, 17}, {36, 20, 19}, {36, 35, 20}, {46, 2, 17}, {20, 22, 12},
+	{0, 1, 46},
+	{1, 2, 46},
+	{2, 3, 17},
+	{3, 17, 21},
+	{0, 46, 38}, 
+	{38, 46, 44},
+	{38, 37, 44},
+	{37, 36, 44},
+	{36, 44, 19},
+	{44, 19, 18},
+	{18, 44, 46},
+	{18, 46, 17},
+	{36, 20, 19},
+	{36, 35, 20},
+	{46, 2, 17},
+	{20, 22, 12},
 	
 	//relleno triangulos de los ojos y de la nariz
-	{35, 20, 11}, {20, 11, 12}, {12, 22, 21}, {12, 21, 13}, {13, 21, 14},
-	{21, 14, 3}, {3, 14, 23}, {23, 14, 24}, {14, 24, 47},
-	{47, 14, 15}, {16, 15, 47}, {16, 45, 47}, {11, 16, 45},
-	{45, 39, 11}, {39, 34, 45}, {39, 35, 11}, {47, 5, 26}, {47, 25, 24},
+	{35, 20, 11},
+	{20, 11, 12},
+	{12, 22, 21},
+	{12, 21, 13},
+	{13, 21, 14},
+	{21, 14, 3},
+	{3, 14, 23},
+	{23, 14, 24},
+	{14, 24, 47},
+	{47, 14, 15},
+	{16, 15, 47},
+	{16, 45, 47},
+	{11, 16, 45},
+	{45, 39, 11},
+	{39, 34, 45},
+	{39, 35, 11},
+	{47, 5, 26},
+	{47, 25, 24},
 
 	//relleno triangulos debajo de la nariz y labios superiores
-	{34, 45, 33}, {45, 33, 47}, {47, 33, 48}, {48, 47, 27}, {47, 25, 5},
+	{34, 45, 33},
+	{45, 33, 47},
+	{47, 33, 48},
+	{48, 47, 27},
+	{47, 25, 5},
 
 	//relleno triangulos por debajo del labio inferior
-	{33, 48, 32}, {48, 32, 27}, { 27, 32, 31}, {27, 30, 31}, {30, 31, 43},
-	{30, 9, 43}, {31, 43, 10}
+	{33, 48, 32},
+	{48, 32, 27},
+	{ 27, 32, 31},
+	{27, 30, 31},
+	{30, 31, 43},
+	{30, 9, 43},
+	{31, 43, 10},
+
+	//colmillos
+	{8, 49, 7},
+	{49, 50, 8} ,
+	{ 49, 50, 29},
+	{49, 28, 29},
+	{29, 28, 54},
+	{54, 51, 29}, 
+	{54, 53, 51}, 
+	{52, 53, 27},
+	{52, 53, 51}
+
 };
 
 int totalConexiones = sizeof(conexiones) / sizeof(conexiones[0]);
@@ -123,7 +195,28 @@ int lecturaArchivo(NODO *catalogo, int *total)
 		printf("  [2] Rostro feliz\n");
 		printf("  [3] Rostro enojado\n");
 		printf("  [4] Rostro triste\n");
+		printf("  [4] Rostro triste\n");
+		printf("  [5] Mostrar/Ocultar Mallado\n");
+		printf("  [6] Mostrar/Ocultar Numeros\n");
 		printf("  [Q] o [ESC] Salir\n");
+
+		printf("\n\nTECLAS DE ROTACION:\n");
+		printf("  [GLUT_KEY_UP] o [GLUT_KEY_DOWN] X\n");
+		printf("  [GLUT_KEY_RIGHT] o [GLUT_KEY_LEFT] Y\n");
+		printf("  [A] o [B] Z\n");
+
+		printf("\n\nTECLAS DE TRASLACION:\n");
+		printf("  [C] o [D] X\n");
+		printf("  [E] o [F] Y\n");
+		printf("  [G] o [H] Z\n");
+
+		printf("\n\nTECLAS DE ESCALACION:\n");
+		printf("  [I] AUMENTAR\n");
+		printf("  [J] DISMINUIR\n");
+
+		printf("\n\nTECLAS DE RESTAURACION:\n");
+		printf("  [K] RESTAURAR ESTADOS\n");
+
 	}
 	return 1;
 }
@@ -147,6 +240,8 @@ FÓRMULA DEL PRINCIPIO DE LA TRASLACIÓN
 
 
 */
+
+
 void obtenerTraslacion(int id, float *tx, float *ty, float *tz)
 {
 	// Por defecto, nadie se mueve (Rostro Serio)

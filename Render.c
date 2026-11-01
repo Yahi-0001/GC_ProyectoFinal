@@ -3,10 +3,24 @@
 #include <math.h>
 #include <stdlib.h>  // Para la función exit()
 
+// variables de rotación
+float rot_x = 0.0;
+float rot_y = 0.0;
+float rot_z = 0.0;
 
-double rot_x = 0.0;
-double rot_y = 0.0;
+// variables de traslación
 float pos_x = 0.0f;
+float pos_y = 0.0f;
+float pos_z = 0.0f;
+
+//variables de escalado
+float scale_x = 1.0f;
+float scale_y = 1.0f;
+float scale_z = 1.0f;
+
+//Mostrar mallado y numeros
+int mostrar_malla = 0;
+int mostrar_numeros = 0;
 
 /*
 FUNCIONES DE MENÚ
@@ -44,6 +58,89 @@ void teclado(unsigned char tecla, int x, int y)
 		case '4': 
 			estadoExpresion = 4; // Triste
 			break;
+		case '5': 
+			mostrar_malla = !mostrar_malla;
+			break;
+		case '6': 
+			mostrar_numeros = !mostrar_numeros;
+			break;
+
+		case 'a':
+		case 'A':
+			rot_z += 5.0f;
+			break;
+
+		case 'b':
+		case 'B':
+			rot_z -= 5.0f;
+			break;
+
+		//teclas de traslación
+		case 'c':
+		case 'C':
+			pos_x += 0.05f;
+			break;
+
+		case 'd':
+		case 'D':
+			pos_x -= 0.05f;
+			break;
+
+		case 'e':
+		case 'E':
+			pos_y += 0.05f;
+			break;
+
+		case 'f':
+		case 'F':
+			pos_y -= 0.05f;
+			break;
+
+		case 'g':
+		case 'G':
+			pos_z += 0.05f;
+			break;
+
+		case 'h':
+		case 'H':
+			pos_z -= 0.05f;
+			break;
+
+		//teclas de escalado
+
+		case 'i':
+		case 'I':    
+			scale_x += 0.1f; 
+			scale_y += 0.1f; 
+			scale_z += 0.1f; 
+			break;
+
+		case 'j': 
+		case 'J': 
+			if(scale_x > 0.1f)
+			{
+				scale_x -= 0.1f; 
+				scale_y -= 0.1f; 
+				scale_z -= 0.1f; 
+			}
+			break;
+
+		//restauración de estados
+		case 'k':
+		case 'K':
+
+			pos_x = 0.0f; 
+			pos_y = 0.0f; 
+      pos_z = 0.0f;
+
+      rot_x = 0.0f; 
+      rot_y = 0.0f; 
+      rot_z = 0.0f;
+
+      scale_x = 1.0f; 
+      scale_y = 1.0f; 
+      scale_z = 1.0f;
+      break;
 		case 'q': 
 		case 'Q':
 		case 27:  // 27 es el codigo ASCII de la tecla ESC
@@ -58,6 +155,7 @@ void teclasEspeciales(int tecla, int x, int y)
 {
 	switch(tecla) 
 	{
+		// teclas de rotación
 		case GLUT_KEY_RIGHT: 
 			rot_y += 5.0; 
 			break;
@@ -69,12 +167,6 @@ void teclasEspeciales(int tecla, int x, int y)
 			break;
 		case GLUT_KEY_DOWN:  
 			rot_x -= 5.0; 
-			break;
-		case GLUT_KEY_F1:    
-			pos_x += 5.0; 
-			break;
-		case GLUT_KEY_F2:  
-			pos_x -= 5.0; 
 			break;
 	}
 	glutPostRedisplay(); 
@@ -161,14 +253,16 @@ void display(void)
   glEnable(GL_COLOR_MATERIAL);
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
   glMaterialfv(GL_FRONT, GL_SPECULAR, luz_especular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, brillo_material);
+   glMaterialfv(GL_FRONT, GL_SHININESS, brillo_material);
 
 	glTranslatef(0.0f, -0.4f, -5.0f);
 	glScalef(4.8f, 4.8f, 1.0f);
 
-	glTranslatef(pos_x, 0.0f, 0.0f);
+	glTranslatef(pos_x, pos_y, pos_z);
 	glRotatef(rot_x, 1.0f, 0.0f, 0.0f);
 	glRotatef(rot_y, 0.0f, 1.0f, 0.0f);
+	glRotatef(rot_z, 0.0f, 0.0f, 1.0f);
+	glScalef(scale_x, scale_y, scale_z);
 
 	GLfloat light_position[] = { 1.0f, 1.0f, 3.0f, 1.0f }; 
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
@@ -235,11 +329,19 @@ void display(void)
 			u1 = u2 = u3 = 0.5f;
 			v1 = v2 = v3 = 0.85f;
 		}
-		else if ((i >= 13 && i <= 15) || (i >= 17 && i <= 19)) 
+		else if (i >= 14 && i <= 25) 
 		{
 			// labios
 			u1 = u2 = u3 = 0.5f;
-			v1 = v2 = v3 = 0.15f;
+			v1 = v2 = v3 = 0.25f;
+
+			printf("Triangulo blanco en renglon: %d\n", i);
+		}
+		else if (i >= 72 && i <= 80) 
+		{
+			// Colmillos / Dientes (Franja color hueso)
+			u1 = u2 = u3 = 0.5f;
+			v1 = v2 = v3 = 0.05f; 
 		}
 		else 
 		{
@@ -310,10 +412,16 @@ void display(void)
 			u1 = u2 = u3 = 0.5f;
 			v1 = v2 = v3 = 0.85f;
 		}
-		else if ((i >= 13 && i <= 15) || (i >= 17 && i <= 19)) 
+		else if (i >= 14 && i <= 25)
 		{
 			u1 = u2 = u3 = 0.5f;
-			v1 = v2 = v3 = 0.15f;
+			v1 = v2 = v3 = 0.25f;
+		}
+		else if (i >= 72 && i <= 80) 
+		{
+			// Colmillos / Dientes (Franja color hueso)
+			u1 = u2 = u3 = 0.5f;
+			v1 = v2 = v3 = 0.05f; 
 		}
 		else 
 		{
@@ -337,117 +445,120 @@ void display(void)
 	glEnd();
 	glPopMatrix(); // Restauramos el lienzo después de los triángulos
 
-	/*
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glColor3f(0.0f, 0.0f, 0.0f); // Color de la línea
-	
-	glBegin(GL_TRIANGLES);
-	for(int i = 0; i < totalConexiones; i++)
+	if(mostrar_malla == 1)
 	{
-		int id1 = conexiones[i][0];
-		int id2 = conexiones[i][1];
-		int id3 = conexiones[i][2];
-
-		float tx1, ty1, tz1, tx2, ty2, tz2, tx3, ty3, tz3;
-		obtenerTraslacion(id1, &tx1, &ty1, &tz1);
-		obtenerTraslacion(id2, &tx2, &ty2, &tz2);
-		obtenerTraslacion(id3, &tx3, &ty3, &tz3);
-
-		glVertex3f(mallaFacial[id1].coordenada.x + tx1, mallaFacial[id1].coordenada.y + ty1, mallaFacial[id1].coordenada.z + tz1);
-		glVertex3f(mallaFacial[id2].coordenada.x + tx2, mallaFacial[id2].coordenada.y + ty2, mallaFacial[id2].coordenada.z + tz2);
-		glVertex3f(mallaFacial[id3].coordenada.x + tx3, mallaFacial[id3].coordenada.y + ty3, mallaFacial[id3].coordenada.z + tz3);
-	}
-	glEnd();
-
-	glPushMatrix();
-	glScalef(-1.0f, 1.0f, 1.0f); 
-	glBegin(GL_TRIANGLES);
-	for(int i = 0; i < totalConexiones; i++)
-	{
-		int id1 = conexiones[i][0];
-		int id2 = conexiones[i][1];
-		int id3 = conexiones[i][2];
-
-		float tx1, ty1, tz1, tx2, ty2, tz2, tx3, ty3, tz3;
-		obtenerTraslacion(id1, &tx1, &ty1, &tz1);
-		obtenerTraslacion(id2, &tx2, &ty2, &tz2);
-		obtenerTraslacion(id3, &tx3, &ty3, &tz3);
-
-		glVertex3f(mallaFacial[id1].coordenada.x + tx1, mallaFacial[id1].coordenada.y + ty1, mallaFacial[id1].coordenada.z + tz1);
-		glVertex3f(mallaFacial[id2].coordenada.x + tx2, mallaFacial[id2].coordenada.y + ty2, mallaFacial[id2].coordenada.z + tz2);
-		glVertex3f(mallaFacial[id3].coordenada.x + tx3, mallaFacial[id3].coordenada.y + ty3, mallaFacial[id3].coordenada.z + tz3);
-	}
-	glEnd();
-	glPopMatrix(); // Restauramos lienzo después de las líneas
-
-	*/
-
-	glEnable(GL_POINT_SMOOTH);// es para que se vean los circulos
-	glEnable(GL_BLEND);// para los puntos
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // artefactos visuales para los puntos 
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glPointSize(8.0f);
-
-	/*
-	//dibujar la mitad original
-	glBegin(GL_POINTS);
-	for(int i = 0; i < totalNodos; i++)
-	{
-		float tx = 0.0f, ty = 0.0f, tz = 0.0f;
-		obtenerTraslacion(mallaFacial[i].key, &tx, &ty, &tz);
-
-		asignarColorPunto(mallaFacial[i].key, 0);
-		glVertex3f(mallaFacial[i].coordenada.x + tx, mallaFacial[i].coordenada.y + ty, mallaFacial[i].coordenada.z + tz);
-	}
-	glEnd();*/
-
-	/*
-	// para debug de la matriz
-	glColor3f(0.0f, 0.0f, 1.0f);
-	for(int i = 0; i < totalNodos; i++)
-	{
-		float tx = 0.0f, ty = 0.0f, tz = 0.0f;
-		obtenerTraslacion(mallaFacial[i].key, &tx, &ty, &tz);
-
-		glRasterPos3f(mallaFacial[i].coordenada.x + 0.03f, mallaFacial[i].coordenada.y + 0.03f, mallaFacial[i].coordenada.z + 0.03f);
-		char texto[10];
-		sprintf(texto, "%d", mallaFacial[i].key); 
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glColor3f(0.0f, 0.0f, 0.0f); // Color de la línea
 		
-		for(int k = 0; texto[k] != '\0'; k++)
+		glBegin(GL_TRIANGLES);
+		for(int i = 0; i < totalConexiones; i++)
 		{
-			glutBitmapCharacter(GLUT_BITMAP_8_BY_13, texto[k]);
+			int id1 = conexiones[i][0];
+			int id2 = conexiones[i][1];
+			int id3 = conexiones[i][2];
+
+			float tx1, ty1, tz1, tx2, ty2, tz2, tx3, ty3, tz3;
+			obtenerTraslacion(id1, &tx1, &ty1, &tz1);
+			obtenerTraslacion(id2, &tx2, &ty2, &tz2);
+			obtenerTraslacion(id3, &tx3, &ty3, &tz3);
+
+			glVertex3f(mallaFacial[id1].coordenada.x + tx1, mallaFacial[id1].coordenada.y + ty1, mallaFacial[id1].coordenada.z + tz1);
+			glVertex3f(mallaFacial[id2].coordenada.x + tx2, mallaFacial[id2].coordenada.y + ty2, mallaFacial[id2].coordenada.z + tz2);
+			glVertex3f(mallaFacial[id3].coordenada.x + tx3, mallaFacial[id3].coordenada.y + ty3, mallaFacial[id3].coordenada.z + tz3);
 		}
-	}*/
+		glEnd();
 
+		glPushMatrix();
+		glScalef(-1.0f, 1.0f, 1.0f); 
+		glBegin(GL_TRIANGLES);
+		for(int i = 0; i < totalConexiones; i++)
+		{
+			int id1 = conexiones[i][0];
+			int id2 = conexiones[i][1];
+			int id3 = conexiones[i][2];
 
-	glPushMatrix();
-	glScalef(-1.0f, 1.0f, 1.0f);
+			float tx1, ty1, tz1, tx2, ty2, tz2, tx3, ty3, tz3;
+			obtenerTraslacion(id1, &tx1, &ty1, &tz1);
+			obtenerTraslacion(id2, &tx2, &ty2, &tz2);
+			obtenerTraslacion(id3, &tx3, &ty3, &tz3);
 
-	/*
-	glBegin(GL_POINTS);
-	for(int i = 0; i < totalNodos; i++)
-	{
-		//dibujamos todo menos la linea central
-		if(mallaFacial[i].coordenada.x != 0.0f)
+			glVertex3f(mallaFacial[id1].coordenada.x + tx1, mallaFacial[id1].coordenada.y + ty1, mallaFacial[id1].coordenada.z + tz1);
+			glVertex3f(mallaFacial[id2].coordenada.x + tx2, mallaFacial[id2].coordenada.y + ty2, mallaFacial[id2].coordenada.z + tz2);
+			glVertex3f(mallaFacial[id3].coordenada.x + tx3, mallaFacial[id3].coordenada.y + ty3, mallaFacial[id3].coordenada.z + tz3);
+		}
+		glEnd();
+		glPopMatrix(); // Restauramos lienzo después de las líneas
+
+		glEnable(GL_POINT_SMOOTH);// es para que se vean los circulos
+		glEnable(GL_BLEND);// para los puntos
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // artefactos visuales para los puntos 
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glPointSize(8.0f);
+
+		//dibujar la mitad original
+		glBegin(GL_POINTS);
+		for(int i = 0; i < totalNodos; i++)
 		{
 			float tx = 0.0f, ty = 0.0f, tz = 0.0f;
 			obtenerTraslacion(mallaFacial[i].key, &tx, &ty, &tz);
 
-			asignarColorPunto(mallaFacial[i].key, 1);
+			asignarColorPunto(mallaFacial[i].key, 0);
 			glVertex3f(mallaFacial[i].coordenada.x + tx, mallaFacial[i].coordenada.y + ty, mallaFacial[i].coordenada.z + tz);
 		}
+		glEnd();
+
+		glPushMatrix();
+		glScalef(-1.0f, 1.0f, 1.0f);
+
+		glBegin(GL_POINTS);
+		for(int i = 0; i < totalNodos; i++)
+		{
+			//dibujamos todo menos la linea central
+			if(mallaFacial[i].coordenada.x != 0.0f)
+			{
+				float tx = 0.0f, ty = 0.0f, tz = 0.0f;
+				obtenerTraslacion(mallaFacial[i].key, &tx, &ty, &tz);
+
+				asignarColorPunto(mallaFacial[i].key, 1);
+				glVertex3f(mallaFacial[i].coordenada.x + tx, mallaFacial[i].coordenada.y + ty, mallaFacial[i].coordenada.z + tz);
+			}
+		}
+		glEnd();
+
+		glPopMatrix(); //restauramos el lienzo
+
 	}
-	glEnd();
 
-	glPopMatrix(); //restauramos el lienzo
+	if(mostrar_numeros == 1)
+	{
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+		glColor3f(0.0f, 0.0f, 1.0f); // Color de los números
 
-	*/
+		// para debug de la matriz
+		glColor3f(0.0f, 0.0f, 1.0f);
+		for(int i = 0; i < totalNodos; i++)
+		{
+			float tx = 0.0f, ty = 0.0f, tz = 0.0f;
+			obtenerTraslacion(mallaFacial[i].key, &tx, &ty, &tz);
+
+			glRasterPos3f(mallaFacial[i].coordenada.x + 0.03f, mallaFacial[i].coordenada.y + 0.03f, mallaFacial[i].coordenada.z + 0.03f);
+			char texto[10];
+			sprintf(texto, "%d", mallaFacial[i].key); 
+			
+			for(int k = 0; texto[k] != '\0'; k++)
+			{
+				glutBitmapCharacter(GLUT_BITMAP_8_BY_13, texto[k]);
+			}
+		}
+	}
+	
 	glDisable(GL_TEXTURE_2D);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
   
@@ -466,6 +577,8 @@ void display(void)
 
 	//dibujar colmillos
 
+
+	/*
 	glColor3f(0.02f, 0.02f, 0.02f);
 	glBegin(GL_QUADS);
 		glNormal3f(0.0f, 0.0f, 1.0f);
@@ -499,7 +612,7 @@ void display(void)
 			glVertex3f(x + ancho, -0.43f, z_dientes);
 			glVertex3f(x + (ancho / 2.0f), -0.32f, z_dientes);
 		}
-	glEnd();
+	glEnd();*/
 
 	glutSwapBuffers(); // mostramos el lienzo
 }
