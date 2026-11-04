@@ -334,8 +334,6 @@ void display(void)
 			// labios
 			u1 = u2 = u3 = 0.5f;
 			v1 = v2 = v3 = 0.25f;
-
-			printf("Triangulo blanco en renglon: %d\n", i);
 		}
 		else if (i >= 72 && i <= 80) 
 		{
